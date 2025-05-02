@@ -32,7 +32,6 @@
       <h2 class="text-2xl font-semibold mb-4">שיעור 1: הבנת הנקרא</h2>
       <video controls class="w-full rounded mb-4 bg-black">
         <source src="lesson1-video.mp4" type="video/mp4">
-        הדפדפן שלך אינו תומך בניגון וידאו.
       </video>
       <div id="quiz-container-1" class="space-y-4"></div>
     </div>
@@ -42,7 +41,6 @@
       <h2 class="text-2xl font-semibold mb-4">שיעור 2: אנלוגיות מילוליות</h2>
       <video controls class="w-full rounded mb-4 bg-black">
         <source src="lesson2-video.mp4" type="video/mp4">
-        הדפדפן שלך אינו תומך בניגון וידאו.
       </video>
       <div id="quiz-container-2" class="space-y-4"></div>
     </div>
@@ -53,8 +51,60 @@
     <a href="../index.html" class="text-blue-600">חזור לדף הבית</a>
   </footer>
 
-  <!-- Load only main.js as a module; it will import questions.js itself -->
-  <script type="module" src="src/lesson/verbal-thinking/javas/main.js"></script>
+  <!-- 1) Load questionsVer.js to define `questions` globally -->
+  <script src="questionsVer.js"></script>
+
+  <!-- 2) Quiz rendering logic -->
+  <script>
+    function showLesson(id) {
+      document.querySelectorAll('.lesson').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function answerQuestion(containerId, qIndex, optIndex) {
+      const q = questions[qIndex];
+      const container = document.getElementById(containerId);
+      const questionDiv = container.querySelectorAll('.question')[qIndex];
+      const resultSpan = questionDiv.querySelector('.result');
+      const buttons = questionDiv.querySelectorAll('button');
+
+      if (optIndex === q.correctAnswer) {
+        resultSpan.textContent = "✅ תשובה נכונה!";
+      } else {
+        resultSpan.textContent = "❌ תשובה שגויה!";
+      }
+      resultSpan.classList.remove('hidden');
+      buttons.forEach(b => b.disabled = true);
+      questionDiv.classList.add('answered');
+    }
+
+    function loadQuestions(containerId) {
+      const container = document.getElementById(containerId);
+      questions.forEach((q, i) => {
+        const div = document.createElement('div');
+        div.className = 'question bg-white p-4 rounded shadow';
+        div.innerHTML = `
+          <p class="mb-2 font-medium">${q.question}</p>
+          ${q.options.map((opt, j) => `
+            <button
+              class="option bg-blue-500 text-white px-4 py-2 rounded mb-2"
+              onclick="answerQuestion('${containerId}', ${i}, ${j})">
+              ${opt}
+            </button>
+          `).join('')}
+          <p class="result hidden font-bold mt-2"></p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadQuestions('quiz-container-1');
+      loadQuestions('quiz-container-2');
+      // Optionally, show the first lesson by default:
+      showLesson('lesson1');
+    });
+  </script>
 
   <!-- Cookie Consent -->
   <script src="../src/cookie-consent.js" charset="utf-8"></script>

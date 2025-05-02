@@ -1,5 +1,5 @@
-// questions.js
-export const questions = [
+// questionsVer.js
+const questions = [
   {
     question: "מהי הבעיה בחישוב?",
     options: ["אופציה 1", "אופציה 2", "אופציה 3", "אופציה 4"],
@@ -9,6 +9,6 @@ export const questions = [
     question: "מהו הפתרון?",
     options: ["אופציה א", "אופציה ב", "אופציה ג", "אופציה ד"],
     correctAnswer: 1
-  },
-  // … הוסף עד 20 שאלות
+  }
+  // … up to 20 questions
 ];
