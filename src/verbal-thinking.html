@@ -54,11 +54,26 @@
   <!-- 1) Load questionsVer.js to define `questions` globally -->
   <script src="questionsVer.js"></script>
 
-  <!-- 2) Quiz rendering logic -->
+  <!-- 2) Cookie-related functions to save/load quiz progress -->
   <script>
-    function showLesson(id) {
-      document.querySelectorAll('.lesson').forEach(el => el.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
+    function saveProgress(progress) {
+      const expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Set to expire in 1 year
+      const cookieString = "quizProgress=" + JSON.stringify(progress) + "; expires=" + expiryDate.toUTCString() + "; path=/";
+      document.cookie = cookieString;
+      console.log('Progress saved in cookie:', cookieString);
+    }
+
+    function loadProgress() {
+      const cookies = document.cookie.split(';');
+      let progress = null;
+      cookies.forEach(cookie => {
+        if (cookie.trim().startsWith('quizProgress=')) {
+          progress = JSON.parse(cookie.split('=')[1]);
+          console.log('Progress loaded from cookie:', progress);
+        }
+      });
+      return progress || {}; // Return an empty object if no progress is found
     }
 
     function answerQuestion(containerId, qIndex, optIndex) {
@@ -76,10 +91,18 @@
       resultSpan.classList.remove('hidden');
       buttons.forEach(b => b.disabled = true);
       questionDiv.classList.add('answered');
+
+      // Save the user's progress
+      const progress = loadProgress();
+      progress[containerId] = progress[containerId] || {};
+      progress[containerId][qIndex] = optIndex === q.correctAnswer ? 'answered' : 'skipped';
+      saveProgress(progress);
     }
 
     function loadQuestions(containerId) {
       const container = document.getElementById(containerId);
+      const progress = loadProgress();
+      
       questions.forEach((q, i) => {
         const div = document.createElement('div');
         div.className = 'question bg-white p-4 rounded shadow';
@@ -95,14 +118,25 @@
           <p class="result hidden font-bold mt-2"></p>
         `;
         container.appendChild(div);
+
+        // Mark previously answered questions as answered
+        if (progress[containerId] && progress[containerId][i] === 'answered') {
+          div.querySelector('.result').textContent = "✅ תשובה נכונה!";
+          div.querySelector('.result').classList.remove('hidden');
+          div.querySelectorAll('button').forEach(b => b.disabled = true);
+        }
       });
+    }
+
+    function showLesson(id) {
+      document.querySelectorAll('.lesson').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       loadQuestions('quiz-container-1');
       loadQuestions('quiz-container-2');
-      // Optionally, show the first lesson by default:
-      showLesson('lesson1');
+      showLesson('lesson1'); // Optionally, show the first lesson by default
     });
   </script>
 
