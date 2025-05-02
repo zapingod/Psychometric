@@ -1,39 +1,62 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>פרקי חשיבה מילולית</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Noto Sans Hebrew', sans-serif;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>פרקי חשיבה מילולית</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Noto Sans Hebrew', sans-serif; }
+    .hidden { display: none; }
+    .answered { opacity: 0.5; }
+  </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
-    <!-- Header Section -->
-    <header class="bg-blue-600 text-white py-8 text-center">
-        <h1 class="text-4xl font-bold">פרקי חשיבה מילולית</h1>
-        <p class="text-xl mt-4">העמק את כישורי החשיבה המילולית שלך.</p>
-    </header>
 
-    <!-- Content Section -->
-    <section class="container mx-auto p-6 mt-8">
-        <h2 class="text-3xl font-semibold mb-6">הנושאים הנלמדים</h2>
-        <ul class="list-disc pl-5 text-lg">
-            <li>הבנת הנקרא</li>
-            <li>אנלוגיות מילוליות</li>
-            <li>ביקורת טקסטים</li>
-            <li>הבנת מושגים והגדרות</li>
-        </ul>
-        <p class="mt-6">התחל ללמוד ולהתמקצע בניתוחים מילוליים ואנלוגיות.</p>
-    </section>
+  <!-- Header -->
+  <header class="bg-blue-600 text-white py-8 text-center">
+    <h1 class="text-4xl font-bold">פרקי חשיבה מילולית</h1>
+    <p class="text-xl mt-4">העמק את כישורי החשיבה המילולית שלך.</p>
+  </header>
 
-    <!-- Footer Section -->
-    <footer class="bg-white text-center p-4 mt-12 shadow">
-        <a href="index.html" class="text-blue-600">חזור לדף הבית</a>
-    </footer>
+  <!-- Tabs -->
+  <section class="container mx-auto mt-10 px-4">
+    <div class="flex justify-center gap-4 mb-6">
+      <button onclick="showLesson('lesson1')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">שיעור 1</button>
+      <button onclick="showLesson('lesson2')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">שיעור 2</button>
+    </div>
+
+    <!-- Lesson 1 -->
+    <div id="lesson1" class="lesson hidden">
+      <h2 class="text-2xl font-semibold mb-4">שיעור 1: הבנת הנקרא</h2>
+      <video controls class="w-full rounded mb-4 bg-black">
+        <source src="lesson1-video.mp4" type="video/mp4">
+        הדפדפן שלך אינו תומך בניגון וידאו.
+      </video>
+      <div id="quiz-container-1" class="space-y-4"></div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div id="lesson2" class="lesson hidden">
+      <h2 class="text-2xl font-semibold mb-4">שיעור 2: אנלוגיות מילוליות</h2>
+      <video controls class="w-full rounded mb-4 bg-black">
+        <source src="lesson2-video.mp4" type="video/mp4">
+        הדפדפן שלך אינו תומך בניגון וידאו.
+      </video>
+      <div id="quiz-container-2" class="space-y-4"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white text-center p-4 mt-12 shadow">
+    <a href="../index.html" class="text-blue-600">חזור לדף הבית</a>
+  </footer>
+
+  <!-- Load only main.js as a module; it will import questions.js itself -->
+  <script type="module" src="src/lesson/verbal-thinking/javas/main.js"></script>
+
+  <!-- Cookie Consent -->
+  <script src="../src/cookie-consent.js" charset="utf-8"></script>
 </body>
 </html>
