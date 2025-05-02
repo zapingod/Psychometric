@@ -54,26 +54,34 @@
   <!-- 1) Load questionsVer.js to define `questions` globally -->
   <script src="questionsVer.js"></script>
 
-  <!-- 2) Cookie-related functions to save/load quiz progress -->
+  <!-- 2) Quiz rendering logic -->
   <script>
-    function saveProgress(progress) {
-      const expiryDate = new Date();
-      expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Set to expire in 1 year
-      const cookieString = "quizProgress=" + JSON.stringify(progress) + "; expires=" + expiryDate.toUTCString() + "; path=/";
-      document.cookie = cookieString;
-      console.log('Progress saved in cookie:', cookieString);
+    // Cookie functions
+    function setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000)); // Set expiry in days
+      const expires = "expires=" + d.toUTCString();
+      document.cookie = name + "=" + value + ";" + expires + ";path=/"; // Ensure path is '/' to be accessible everywhere
     }
 
-    function loadProgress() {
-      const cookies = document.cookie.split(';');
-      let progress = null;
-      cookies.forEach(cookie => {
-        if (cookie.trim().startsWith('quizProgress=')) {
-          progress = JSON.parse(cookie.split('=')[1]);
-          console.log('Progress loaded from cookie:', progress);
+    function getCookie(name) {
+      const decodedCookie = decodeURIComponent(document.cookie); // Decode to handle special characters
+      const ca = decodedCookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1); // Remove any leading spaces
         }
-      });
-      return progress || {}; // Return an empty object if no progress is found
+        if (c.indexOf(name) === 0) {
+          return c.substring(name.length, c.length); // Return the cookie value if found
+        }
+      }
+      return "";
+    }
+
+    function showLesson(id) {
+      document.querySelectorAll('.lesson').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
     }
 
     function answerQuestion(containerId, qIndex, optIndex) {
@@ -92,17 +100,14 @@
       buttons.forEach(b => b.disabled = true);
       questionDiv.classList.add('answered');
 
-      // Save the user's progress
-      const progress = loadProgress();
-      progress[containerId] = progress[containerId] || {};
-      progress[containerId][qIndex] = optIndex === q.correctAnswer ? 'answered' : 'skipped';
-      saveProgress(progress);
+      // Save answer to cookies with unique question id
+      const answeredQuestions = getCookie('answeredQuestions') ? JSON.parse(getCookie('answeredQuestions')) : {};
+      answeredQuestions[q.id] = optIndex; // Save the selected answer by question ID
+      setCookie('answeredQuestions', JSON.stringify(answeredQuestions), 30); // Save for 30 days
     }
 
     function loadQuestions(containerId) {
       const container = document.getElementById(containerId);
-      const progress = loadProgress();
-      
       questions.forEach((q, i) => {
         const div = document.createElement('div');
         div.className = 'question bg-white p-4 rounded shadow';
@@ -118,25 +123,35 @@
           <p class="result hidden font-bold mt-2"></p>
         `;
         container.appendChild(div);
+      });
 
-        // Mark previously answered questions as answered
-        if (progress[containerId] && progress[containerId][i] === 'answered') {
-          div.querySelector('.result').textContent = "✅ תשובה נכונה!";
-          div.querySelector('.result').classList.remove('hidden');
-          div.querySelectorAll('button').forEach(b => b.disabled = true);
+      // Load saved answers from cookies if they exist
+      const answeredQuestions = getCookie('answeredQuestions') ? JSON.parse(getCookie('answeredQuestions')) : {};
+      questions.forEach((q, i) => {
+        if (answeredQuestions[q.id] !== undefined) {
+          const container = document.getElementById(containerId);
+          const questionDiv = container.querySelectorAll('.question')[i];
+          const resultSpan = questionDiv.querySelector('.result');
+          const buttons = questionDiv.querySelectorAll('button');
+
+          // Display the result based on saved answer
+          if (answeredQuestions[q.id] === q.correctAnswer) {
+            resultSpan.textContent = "✅ תשובה נכונה!";
+          } else {
+            resultSpan.textContent = "❌ תשובה שגויה!";
+          }
+          resultSpan.classList.remove('hidden');
+          buttons.forEach(b => b.disabled = true);
+          questionDiv.classList.add('answered');
         }
       });
-    }
-
-    function showLesson(id) {
-      document.querySelectorAll('.lesson').forEach(el => el.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       loadQuestions('quiz-container-1');
       loadQuestions('quiz-container-2');
-      showLesson('lesson1'); // Optionally, show the first lesson by default
+      // Optionally, show the first lesson by default:
+      showLesson('lesson1');
     });
   </script>
 
